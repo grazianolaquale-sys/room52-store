@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Room 52 Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: shop da telefono, una colonna stretta che si allarga a griglia su desktop; nero/bianco da streetwear, rosso solo per azioni */
+  --ink:#0d0d0d;
+  --paper:#ffffff;
+  --mist:#f1f1ef;
+  --line:#dcdcd8;
+  --muted:#6b6b66;
+  --signal:#d7261e;
+  --display:"Anton","Impact","Arial Narrow",sans-serif;
+  --body:"Archivo","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;max-width:1180px;margin:0 auto}
+.logo{font-family:var(--display);font-size:24px;white-space:nowrap;letter-spacing:.04em;text-decoration:none;line-height:1}
+.logo span{color:var(--signal)}
+.logo i{font-style:normal}
+nav.main{display:none;gap:22px;font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:.06em}
+nav.main a{text-decoration:none}
+nav.main a[aria-current="page"]{border-bottom:2px solid var(--ink)}
+.icons{display:flex;gap:6px;align-items:center}
+.iconbtn{background:none;border:0;padding:8px;display:flex;align-items:center;gap:6px;font-weight:700}
+.count{background:var(--ink);color:var(--paper);border-radius:999px;font-size:11px;min-width:20px;height:20px;display:inline-grid;place-items:center;padding:0 6px}
+.drawer{display:none;border-top:1px solid var(--line);padding:8px 16px 16px}
+.drawer.open{display:grid;gap:2px}
+.drawer a{padding:10px 0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;border-bottom:1px solid var(--mist)}
+main{max-width:1180px;margin:0 auto;padding:0 16px 64px}
+.view{display:none}
+.view.on{display:block}
+h1,h2,h3{text-wrap:balance}
+.disp{font-family:var(--display);font-weight:400;text-transform:uppercase;letter-spacing:.01em;line-height:.95}
+/* hero */
+.hero{position:relative;margin:16px 0 0;border-radius:6px;overflow:hidden;background:var(--ink)}
+.hero img{width:100%;height:440px;object-fit:cover;object-position:center 40%;opacity:.82}
+.hero .txt{position:absolute;left:0;right:0;bottom:0;padding:22px 18px;color:var(--paper);background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.hero h1{font-size:46px;margin:0 0 8px}
+.hero p{margin:0 0 14px;max-width:36ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:12px 18px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:14px;text-decoration:none;border-radius:4px}
+.btn.light{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.red{background:var(--signal);border-color:var(--signal)}
+.btn.wide{width:100%}
+.perks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 4px;font-size:12px;text-align:center}
+.perks div{background:var(--mist);padding:10px 6px;border-radius:4px}
+.perks b{display:block;font-size:13px}
+.sec{margin-top:34px}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.sechead h2{font-size:30px;margin:0}
+.sechead a{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cat{position:relative;border:0;padding:0;background:var(--ink);border-radius:4px;overflow:hidden;text-align:left;color:var(--paper)}
+.cat img{width:100%;aspect-ratio:1/1;object-fit:cover;opacity:.7}
+.cat span{position:absolute;left:10px;bottom:8px;font-family:var(--display);font-size:24px;text-transform:uppercase}
+/* shop */
+.filters{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.chip{flex:0 0 auto;border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.subf{display:flex;gap:8px;align-items:center;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 10px}
+.card{text-decoration:none;display:flex;flex-direction:column;gap:6px}
+.card .ph{position:relative;background:var(--mist);border-radius:4px;overflow:hidden}
+.card img{width:100%;aspect-ratio:4/5;object-fit:cover;transition:transform .3s}
+.card:hover img{transform:scale(1.03)}
+.tag{position:absolute;top:8px;left:8px;background:var(--paper);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 7px;border-radius:2px}
+.card h3{font-size:14px;font-weight:600;margin:0;line-height:1.3}
+.price{font-weight:700;font-variant-numeric:tabular-nums}
+.price.ask{font-weight:500;color:var(--muted);font-size:13px}
+/* product */
+.back{display:inline-block;margin:14px 0;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-decoration:none}
+.pd{display:grid;gap:18px}
+.pd .ph{background:var(--mist);border-radius:4px;overflow:hidden}
+.pd .ph img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.pd h1{font-size:34px;margin:0 0 6px}
+.pd .meta{color:var(--muted);font-size:14px;margin:0 0 12px}
+.pd .price{font-size:22px}
+.sizes{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.size{min-width:52px;height:44px;border:1.5px solid var(--line);background:var(--paper);border-radius:4px;font-weight:700}
+.size[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.note{font-size:13px;color:var(--muted)}
+.thumbs{display:flex;gap:8px;margin-top:8px}
+.thumb{border:1.5px solid var(--line);background:var(--paper);padding:0;border-radius:4px;overflow:hidden;width:84px;text-align:center;font-size:10px;font-weight:600}
+.thumb img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.thumb span{display:block;padding:3px 2px}
+.thumb[aria-pressed="true"]{border-color:var(--ink)}
+.err{color:var(--signal);font-size:13px;font-weight:600;min-height:1.2em;margin:4px 0}
+.info{border-top:1px solid var(--line);margin-top:18px}
+.info div{border-bottom:1px solid var(--line);padding:12px 0;font-size:14px}
+.info b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.src{font-size:12px;color:var(--muted);margin-top:8px}
+/* cart */
+.line{display:grid;grid-template-columns:72px 1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
+.line img{width:72px;height:90px;object-fit:cover;border-radius:3px}
+.line h3{font-size:14px;margin:0}
+.qty{display:flex;align-items:center;gap:6px;margin-top:6px}
+.qty button{width:28px;height:28px;border:1.5px solid var(--line);background:var(--paper);border-radius:3px;font-weight:700}
+.rm{background:none;border:0;color:var(--muted);font-size:12px;text-decoration:underline;padding:4px}
+.summary{background:var(--mist);border-radius:6px;padding:16px;margin-top:18px;display:grid;gap:12px}
+.opt{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:1.5px solid var(--line);border-radius:4px;padding:12px;font-size:14px}
+.opt input{margin-top:3px;accent-color:var(--ink)}
+.opt:has(input:checked){border-color:var(--ink)}
+.field label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:4px;padding:10px;font:inherit;background:var(--paper)}
+.tot{display:flex;justify-content:space-between;font-weight:700;font-variant-numeric:tabular-nums}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+.preview{white-space:pre-wrap;font-size:13px;background:var(--paper);border:1px dashed var(--line);border-radius:4px;padding:10px;max-height:220px;overflow:auto}
+.ctas{display:grid;gap:8px}
+.ph-warn{font-size:12px;color:var(--signal);font-weight:600}
+/* pages */
+.page h1{font-size:42px;margin:22px 0 12px}
+.page p{max-width:62ch}
+.stores{display:grid;gap:12px;margin-top:12px}
+.store{border:1.5px solid var(--line);border-radius:6px;padding:16px}
+.store h3{font-family:var(--display);font-weight:400;font-size:24px;text-transform:uppercase;margin:0 0 4px}
+.store .badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--mist);padding:2px 8px;border-radius:2px;margin-bottom:8px}
+.facts{display:grid;gap:10px;margin:16px 0;padding:0;list-style:none}
+.facts li{border-left:3px solid var(--ink);padding:4px 0 4px 12px}
+.social{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+footer{background:var(--ink);color:#cfcfca;font-size:13px}
+footer .in{max-width:1180px;margin:0 auto;padding:28px 16px;display:grid;gap:16px}
+footer .logo{color:var(--paper)}
+footer a{color:var(--paper)}
+footer .credit{max-width:1180px;margin:0 auto;padding:0 16px 18px;font-size:11px;color:#8d8d88}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 16px;border-radius:4px;font-size:14px;font-weight:600;display:none;z-index:50;max-width:calc(100% - 32px)}
+.toast.on{display:block}
+
+.helpbtn{border:1.5px solid var(--ink);background:var(--paper);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.tour-hl{position:fixed;z-index:60;border-radius:8px;box-shadow:0 0 0 3px var(--signal),0 0 0 9999px rgba(0,0,0,.62);pointer-events:none;transition:all .25s ease}
+.tour-hl.none{box-shadow:0 0 0 9999px rgba(0,0,0,.62);width:0!important;height:0!important}
+.tour-bub{position:fixed;z-index:61;background:var(--paper);color:var(--ink);border-radius:10px;padding:14px 14px 12px;width:min(340px,calc(100vw - 32px));box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.tour-bub .st{font-size:11px;font-weight:700;color:var(--signal);text-transform:uppercase;letter-spacing:.06em}
+.tour-bub h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:22px;margin:2px 0 6px;line-height:1}
+.tour-bub p{margin:0 0 12px;font-size:14px;line-height:1.4}
+.tour-bub ul{margin:0 0 12px;padding-left:18px;font-size:14px;line-height:1.4}
+.tour-nav{display:flex;gap:8px;align-items:center}
+.tour-nav .sp{flex:1}
+.tour-nav button{border:1.5px solid var(--ink);border-radius:4px;padding:8px 12px;font-weight:700;font-size:13px;background:var(--paper)}
+.tour-nav .nx{background:var(--ink);color:var(--paper)}
+.tour-nav .sk{border:0;background:none;color:var(--muted);text-decoration:underline;padding:8px 4px}
+.tour-block{position:fixed;inset:0;z-index:59}
+@media (max-width:759px){.logo{font-size:18px}.helpbtn{padding:5px 8px;font-size:10.5px}.bar{gap:6px;padding:12px 10px}.iconbtn{padding:5px}.icons{gap:2px}}
+@media (max-width:345px){.lg-s{display:none}}
+@media (max-width:380px){.logo{font-size:16px}.helpbtn{padding:4px 7px;font-size:10px;letter-spacing:0}.bar{padding:10px 10px}.iconbtn svg{width:20px;height:20px}}
+@media (min-width:760px){
+  nav.main{display:flex}
+  .menu-btn{display:none!important}
+  .hero img{height:520px}
+  .hero h1{font-size:72px}
+  .hero .txt{padding:36px}
+  .grid{grid-template-columns:repeat(4,1fr);gap:22px 16px}
+  .cats{grid-template-columns:repeat(6,1fr)}
+  .pd{grid-template-columns:1.1fr 1fr;gap:40px;align-items:start}
+  .stores{grid-template-columns:repeat(3,1fr)}
+  .cartwrap{display:grid;grid-template-columns:1.4fr 1fr;gap:32px;align-items:start}
+  footer .in{grid-template-columns:2fr 1fr 1fr}
+  .perks{max-width:640px}
+}
+@media (min-width:760px) and (max-width:959px){nav.main{display:none}.menu-btn{display:flex!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="logo" href="#home">ROOM <span>52</span><i class="lg-s"> STORE</i></a>
+    <nav class="main" aria-label="Menu principale">
+      <a href="#home">Home</a><a href="#shop">Shop</a><a href="#chi-siamo">Chi siamo</a><a href="#negozi">Negozi</a><a href="#contatti">Contatti</a>
+    </nav>
+    <div class="icons">
+      <button class="helpbtn" id="helpBtn" aria-label="Come funziona il sito">Come funziona</button>
+      <a class="iconbtn" href="#carrello" aria-label="Apri il carrello">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+        <span class="count" id="cartCount">0</span>
+      </a>
+      <button class="iconbtn menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer" aria-label="Apri il menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="drawer" id="drawer">
+    <a href="#home">Home</a><a href="#shop">Shop</a><a href="#chi-siamo">Chi siamo</a><a href="#negozi">Negozi</a><a href="#contatti">Contatti</a>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section class="view" id="v-home">
+    <div class="hero">
+      <img src="img/hero.jpg" alt="Interno del negozio Room 52 con felpe, jeans e giubbotti esposti">
+      <div class="txt">
+        <h1 class="disp">Il vero streetwear</h1>
+        <p>Abbigliamento uomo e linea ragazzo 10/16 anni. Nuovi arrivi ogni settimana, anche direttamente dall'America.</p>
+        <a class="btn light" href="#shop">Vai allo shop</a>
+      </div>
+    </div>
+    <div class="perks">
+      <div><b>24/48h</b>consegna</div>
+      <div><b>3 negozi</b>Santeramo e Altamura</div>
+      <div><b>Ritiro</b>in negozio</div>
+    </div>
+    <div class="sec">
+      <div class="sechead"><h2 class="disp">Categorie</h2><a href="#shop">Vedi tutto</a></div>
+      <div class="cats" id="cats"></div>
+    </div>
+    <div class="sec">
+      <div class="sechead"><h2 class="disp">Nuovi arrivi</h2><a href="#shop">Tutti i capi</a></div>
+      <div class="grid" id="homeGrid"></div>
+    </div>
+    <div class="sec">
+      <div class="sechead"><h2 class="disp">Linea 10/16 anni</h2><a href="#shop" data-linea="Junior">Vedi la linea</a></div>
+      <div class="grid" id="juniorGrid"></div>
+    </div>
+  </section>
+
+  <!-- SHOP -->
+  <section class="view" id="v-shop">
+    <div class="sechead" style="margin-top:22px"><h2 class="disp" style="font-size:38px">Shop</h2><span class="note" id="shopCount"></span></div>
+    <div class="filters" id="catFilters" role="group" aria-label="Filtra per categoria"></div>
+    <div class="subf">
+      <span>Linea:</span>
+      <div class="filters" id="lineFilters" role="group" aria-label="Filtra per linea" style="padding:0"></div>
+    </div>
+    <div class="grid" id="shopGrid"></div>
+  </section>
+
+  <!-- PRODOTTO -->
+  <section class="view" id="v-prodotto"></section>
+
+  <!-- CARRELLO -->
+  <section class="view" id="v-carrello"></section>
+
+  <!-- CHI SIAMO -->
+  <section class="view page" id="v-chi-siamo">
+    <h1 class="disp">Chi siamo</h1>
+    <p>Room 52 Store è il negozio di streetwear di Alessio: abbigliamento uomo e linea ragazzo dai 10 ai 16 anni. Questa è la storia raccontata da lui.</p>
+    <ul class="facts">
+      <li><b>14 anni.</b> Cerca un lavoretto estivo e finisce al mercato. Vende già abbigliamento.</li>
+      <li><b>Sei anni dopo.</b> Prova altre strade: fabbro, carpentiere, cameriere e tanti altri lavori. Nessuno gli dà la soddisfazione della vendita di abbigliamento.</li>
+      <li><b>2019, 20 anni.</b> Decide di aprire la sua attività: Room 52 Store.</li>
+      <li><b>25 ottobre 2020.</b> Il taglio del nastro, dopo tanto lavoro.</li>
+      <li><b>Uomo.</b> Parte con abbigliamento uomo e donna, poi negli anni si specializza solo sull'uomo.</li>
+      <li><b>Oggi.</b> I primi tre anni non sono stati facili. Grazie ai clienti e ai social le cose vanno bene, e ogni settimana arrivano tanti nuovi articoli di tendenza.</li>
+    </ul>
+    <p>Il suo messaggio ai ragazzi è di credere nei propri sogni: "ce l'ho fatta io, ce la fanno tutti".</p>
+    <a class="btn" href="#shop">Guarda i capi</a>
+  </section>
+
+  <!-- NEGOZI -->
+  <section class="view page" id="v-negozi">
+    <h1 class="disp">I negozi</h1>
+    <p>Vieni a provare i capi o a ritirare il tuo ordine.</p>
+    <div class="stores" id="storesList"></div>
+  </section>
+
+  <!-- CONTATTI -->
+  <section class="view page" id="v-contatti">
+    <h1 class="disp">Contatti</h1>
+    <p>Per ordini, taglie e disponibilità scrivici su WhatsApp o in DM su Instagram.</p>
+    <div class="info">
+      <div><b>WhatsApp</b><span id="waText"></span></div>
+      <div><b>Email</b>info@room52store.it</div>
+      <div><b>Consegna</b>24/48h</div>
+    </div>
+    <div class="social">
+      <a class="btn" href="https://www.instagram.com/room52_store/">Instagram</a>
+      <a class="btn ghost" href="https://www.tiktok.com/@room52_store">TikTok</a>
+      <a class="btn ghost" href="https://www.facebook.com/search/top?q=Room%2052%20store">Facebook</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="in">
+    <div>
+      <div class="logo">ROOM 52 STORE</div>
+      <p>Streetwear uomo e ragazzo. Santeramo in Colle e Altamura (BA).</p>
+      <p>Prezzi, taglie e disponibilità si confermano in negozio o in chat.</p>
+    </div>
+    <div><b>Shop</b><br><a href="#shop">Tutti i capi</a><br><a href="#carrello">Carrello</a></div>
+    <div><b>Info</b><br><a href="#chi-siamo">Chi siamo</a><br><a href="#negozi">Negozi</a><br><a href="#contatti">Contatti</a></div>
+  </div>
+  <p class="credit">Proposta di sito realizzata da Graziano Laquale</p>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = {"negozi": [{"id": "santeramo", "nome": "Santeramo in Colle", "indirizzo": "Via Gaetano Donizetti 13/A, Santeramo in Colle (BA)"}, {"id": "altamura9", "nome": "Altamura", "indirizzo": "Via Gravina 9/B, Altamura (BA)"}, {"id": "altamura37", "nome": "Altamura, nuova sede", "indirizzo": "Via Gravina 37/39, Altamura (BA)"}], "prodotti": [{"id": "giubbotto-nero-cappuccio", "nome": "Giubbotto nero con cappuccio", "categoria": "Giubbotti", "linea": "Uomo", "prezzo": null, "foto": ["img/giubbotto-nero-cappuccio.jpg", "img/orig-giubbotto-nero-cappuccio.jpg"], "descrizione": "Giubbotto nero oversize imbottito, con cappuccio e zip.", "data_post": "23 ottobre 2026", "didascalia": "Nuovo outfit totalmente disponibile in store."}, {"id": "polo-righe-bianco-nera", "nome": "Polo rugby a righe bianco e nera", "categoria": "Maglie", "linea": "Uomo", "prezzo": null, "foto": ["img/polo-righe-bianco-nera.jpg", "img/orig-polo-righe-bianco-nera.jpg"], "descrizione": "Polo a maniche lunghe a righe larghe bianche e nere, con colletto, ricami e toppe sul petto.", "data_post": "23 ottobre 2026", "didascalia": "Nuovo outfit totalmente disponibile in store."}, {"id": "felpa-zip-bandiera-rosa", "nome": "Felpa zip bandiera americana", "categoria": "Felpe", "linea": "Uomo", "prezzo": null, "foto": ["img/felpa-zip-bandiera-rosa.jpg", "img/orig-felpa-zip-bandiera-rosa.jpg"], "descrizione": "Felpa con zip e cappuccio, bandiera americana rosa e bianca con effetto slavato.", "data_post": "24 ottobre 2026", "didascalia": "Stiamo in America"}, {"id": "bomber-grigio", "nome": "Bomber grigio", "categoria": "Giubbotti", "linea": "Uomo", "prezzo": null, "foto": ["img/bomber-grigio.jpg", "img/orig-bomber-grigio.jpg"], "descrizione": "Bomber grigio lucido con tasca zip sulla manica, colletto, polsini e fondo a costine.", "data_post": "28 ottobre 2026", "didascalia": "Nuovi arrivi ogni 24h"}, {"id": "piumino-nero", "nome": "Piumino nero corto", "categoria": "Giubbotti", "linea": "Uomo", "prezzo": null, "foto": ["img/piumino-nero.jpg", "img/orig-piumino-nero.jpg"], "descrizione": "Piumino corto nero opaco con cappuccio e zip.", "data_post": "30 ottobre 2026", "didascalia": ""}, {"id": "felpa-nera-stampa-bocche", "nome": "Felpa nera con stampa tre cani", "categoria": "Felpe", "linea": "Uomo", "prezzo": null, "foto": ["img/felpa-nera-stampa-bocche.jpg", "img/orig-felpa-nera-stampa-bocche.jpg"], "descrizione": "Felpa nera con cappuccio, grande stampa di tre cani sul petto e scritte rosso-arancio sulle maniche.", "data_post": "30 ottobre 2026", "didascalia": "New drop minimal, articoli unici disponibili solo nei nostri store."}, {"id": "jeans-strappati-chiari", "nome": "Jeans baggy chiari strappati", "categoria": "Pantaloni", "linea": "Uomo", "prezzo": null, "foto": ["img/jeans-strappati-chiari.jpg", "img/orig-jeans-strappati-chiari.jpg"], "descrizione": "Jeans a gamba larga, lavaggio chiaro con sfumature e strappi sulle ginocchia.", "data_post": "28 ottobre 2026", "didascalia": "Nuova sede in Via Gravina 37/39 Altamura con 200 mq di prodotti."}, {"id": "tuta-zip-nera", "nome": "Tuta nera con felpa zip", "categoria": "Tute", "linea": "Uomo", "prezzo": null, "foto": ["img/tuta-zip-nera.jpg", "img/orig-tuta-zip-nera.jpg"], "descrizione": "Completo nero: felpa con zip e cappuccio e pantalone largo coordinato.", "data_post": "28 ottobre 2026", "didascalia": "LA GENTE TREMAVA"}, {"id": "camicia-quadri", "nome": "Camicia a quadri bianca e nera", "categoria": "Camicie", "linea": "Uomo", "prezzo": null, "foto": ["img/camicia-quadri.jpg", "img/orig-camicia-quadri.jpg"], "descrizione": "Camicia in flanella a quadri grandi bianchi e neri, da portare aperta.", "data_post": "28 ottobre 2026", "didascalia": ""}, {"id": "felpa-bianca-stampa-blu", "nome": "Felpa bianca con ritratto blu", "categoria": "Felpe", "linea": "Uomo", "prezzo": null, "foto": ["img/felpa-bianca-stampa-blu.jpg", "img/orig-felpa-bianca-stampa-blu.jpg"], "descrizione": "Felpa girocollo bianca con grande ritratto stampato in blu sul petto e grafiche blu sulle maniche.", "data_post": "23 ottobre 2026", "didascalia": "E che ti compri!! LA GENTE TREMAVA"}, {"id": "maglia-raglan-valley", "nome": "Maglia raglan \"Valley\"", "categoria": "Maglie", "linea": "Uomo", "prezzo": null, "foto": ["img/maglia-raglan-valley.jpg", "img/orig-maglia-raglan-valley.jpg"], "descrizione": "Maglia oversize a maniche lunghe raglan, corpo scuro e maniche beige, stampe grafiche bianche.", "data_post": "6 novembre 2026", "didascalia": "New outfit"}, {"id": "giubbotto-pelle-marrone", "nome": "Giubbotto in pelle marrone", "categoria": "Giubbotti", "linea": "Uomo", "prezzo": null, "foto": ["img/giubbotto-pelle-marrone.jpg", "img/orig-giubbotto-pelle-marrone.jpg"], "descrizione": "Giubbotto marrone scuro effetto vissuto, con colletto a punta e zip.", "data_post": "6 novembre 2026", "didascalia": "New outfit"}, {"id": "jeans-neri-larghi", "nome": "Jeans neri larghi", "categoria": "Pantaloni", "linea": "Uomo", "prezzo": null, "foto": ["img/jeans-neri-larghi.jpg", "img/orig-jeans-neri-larghi.jpg"], "descrizione": "Jeans neri a gamba larga.", "data_post": "23 ottobre 2026", "didascalia": "E che ti compri!! LA GENTE TREMAVA"}, {"id": "bomber-chicago", "nome": "Bomber nero \"Chicago\"", "categoria": "Giubbotti", "linea": "Junior", "prezzo": 49.99, "foto": ["img/bomber-chicago.jpg"], "descrizione": "Bomber nero imbottito con scritta Chicago in gotico bianco sulla schiena, polsini e fondo a righe.", "data_post": "26 ottobre 2026", "didascalia": "I nostri bomber 10/16 anni a soli 49,99€"}, {"id": "bomber-los-angeles", "nome": "Bomber nero \"Los Angeles\"", "categoria": "Giubbotti", "linea": "Junior", "prezzo": 49.99, "foto": ["img/bomber-los-angeles.jpg"], "descrizione": "Bomber nero lucido imbottito con scritta Los Angeles sulla schiena e sulle maniche.", "data_post": "26 ottobre 2026", "didascalia": "I nostri bomber 10/16 anni a soli 49,99€"}, {"id": "felpa-labbra-bianca", "nome": "Felpa bianca Hustler con labbra", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-labbra-bianca.jpg"], "descrizione": "Felpa bianca con cappuccio, stampa labbra rosa con grillz e scritta Hustler sulla manica.", "data_post": "24 ottobre 2026", "didascalia": "Bianca o nera? Siamo la tendenza!"}, {"id": "felpa-labbra-nera", "nome": "Felpa nera Hustler con labbra", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-labbra-nera.jpg"], "descrizione": "Felpa nera con cappuccio, stampa labbra rosa con grillz e scritte rosa sulle maniche.", "data_post": "24 ottobre 2026", "didascalia": "Bianca o nera? Siamo la tendenza!"}, {"id": "maglione-camouflage", "nome": "Maglione camouflage", "categoria": "Maglie", "linea": "Junior", "prezzo": null, "foto": ["img/maglione-camouflage.jpg"], "descrizione": "Maglione girocollo in maglia con fantasia camouflage verde.", "data_post": "26 ottobre 2026", "didascalia": "Gli articoli 10/16 anni, quelli seri"}, {"id": "felpa-wrtn-bianca", "nome": "Felpa polo WRTN Streetwear", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-wrtn-bianca.jpg"], "descrizione": "Felpa con colletto, scritta WRTN Streetwear e bandiera americana. Colori visti nel post: bianco, azzurro, nero e rosso.", "data_post": "31 ottobre 2026", "didascalia": "Sfoglia e scegli il tuo colore preferito. Nuovi arrivi direttamente dall'America"}, {"id": "felpa-dream-nera", "nome": "Felpa nera \"1 Dream\"", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-dream-nera.jpg"], "descrizione": "Felpa nera con cappuccio, grande 1 con strass, cerchio di stelle e scritta Dream. Vista anche in bianco.", "data_post": "31 ottobre 2026", "didascalia": "Nuovi arrivi 10/16 anni. SIAMO IL VERO STREETWEAR."}, {"id": "felpa-black-money-245", "nome": "Felpa nera \"Black Money 245\"", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-black-money-245.jpg"], "descrizione": "Felpa nera con cappuccio e stampa colorata Black Money 245 con fiamme e dadi.", "data_post": "23 ottobre 2026", "didascalia": "New drop 10/16. Sfoglia e scegli il tuo outfit preferito."}, {"id": "polo-black-distro", "nome": "Polo nera \"Black Distro 07\"", "categoria": "Maglie", "linea": "Junior", "prezzo": null, "foto": ["img/polo-black-distro.jpg"], "descrizione": "Felpa polo nera con scritta Black Distro, croce, EST 07 e bande bianche con 07 sulle maniche.", "data_post": "23 ottobre 2026", "didascalia": "Dalla 10 alla 16 anni."}, {"id": "felpa-grillz-nera", "nome": "Felpa nera TVM con grillz", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-grillz-nera.jpg"], "descrizione": "Felpa nera con cappuccio, grande bocca con grillz e catena di strass e scritta TVM.", "data_post": "30 ottobre 2026", "didascalia": "OK."}, {"id": "cargo-camouflage", "nome": "Pantaloni cargo camouflage con strass", "categoria": "Pantaloni", "linea": "Junior", "prezzo": null, "foto": ["img/cargo-camouflage.jpg"], "descrizione": "Cargo a gamba larga in fantasia camouflage chiara con piccoli strass e tasche laterali.", "data_post": "30 ottobre 2026", "didascalia": "OK."}, {"id": "maglioncino-money-bianco", "nome": "Maglioncino bianco mod. Art Super Money", "categoria": "Maglie", "linea": "Junior", "prezzo": null, "foto": ["img/maglioncino-money-bianco.jpg"], "descrizione": "Maglioncino bianco con grande stampa di bocca con grillz e catena, croce di strass.", "data_post": "30 ottobre 2026", "didascalia": "Drop 10/16 anni. Qui si TREMA. Flared jeans e maglioncino mod. Art super Money"}, {"id": "felpa-zip-bianca-tribale", "nome": "Felpa zip bianca tribale con pelliccia", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-zip-bianca-tribale.jpg"], "descrizione": "Felpa bianca con zip, cappuccio bordato in pelliccia sintetica e grafiche tribali nere.", "data_post": "27 ottobre 2026", "didascalia": "New drop 10/16 anni, sempre sul pezzo."}, {"id": "giubbotto-nero-pelliccia", "nome": "Giubbotto zip nero tribale con pelliccia", "categoria": "Giubbotti", "linea": "Junior", "prezzo": null, "foto": ["img/giubbotto-nero-pelliccia.jpg"], "descrizione": "Felpa-giubbotto nera con zip, cappuccio in pelliccia sintetica e grafiche tribali azzurre.", "data_post": "27 ottobre 2026", "didascalia": "New drop 10/16 anni, sempre sul pezzo."}, {"id": "felpa-cappuccio-bianca-stampa", "nome": "Felpa zip bianca con t-shirt stampata", "categoria": "Felpe", "linea": "Junior", "prezzo": null, "foto": ["img/felpa-cappuccio-bianca-stampa.jpg"], "descrizione": "Felpa bianca con zip e cappuccio, abbinata a t-shirt bianca con grande stampa colorata.", "data_post": "24 ottobre 2026", "didascalia": "Drop 10/16 anni Altamura via Gravina 37/39"}]};
+const WHATSAPP = "NUMERO_WHATSAPP_DA_INSERIRE"; // solo cifre con prefisso, es. 39XXXXXXXXXX
+const IG = "https://www.instagram.com/room52_store/";
+const SIZES = ["S","M","L","XL","XXL"];
+const SIZES_JR = ["10 anni","12 anni","14 anni","16 anni"];
+const STORES = DATA.negozi.map(s=>({id:s.id,name:s.nome,addr:s.indirizzo,badge:s.id==="santeramo"?"Santeramo":(s.id==="altamura37"?"200 mq di prodotti":"Altamura")}));
+const PRODUCTS = DATA.prodotti.map(p=>({id:p.id,name:p.nome,cat:p.categoria,line:p.linea,price:p.prezzo,img:p.foto[0],foto:p.foto,desc:p.descrizione,post:p.data_post+(p.didascalia?": \""+p.didascalia+"\"":"")}));
+const CATS = ["Felpe","Giubbotti","Maglie","Pantaloni","Tute","Camicie"];
+const eur = n => n.toLocaleString("it-IT",{style:"currency",currency:"EUR"});
+const $ = s => document.querySelector(s);
+const state = {cat:"Tutti", line:"Tutte", cart:[]};
+try{ state.cart = JSON.parse(localStorage.getItem("r52cart")||"[]"); }catch(e){ state.cart=[]; }
+function save(){ try{ localStorage.setItem("r52cart", JSON.stringify(state.cart)); }catch(e){} $("#cartCount").textContent = state.cart.reduce((a,b)=>a+b.q,0); }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+function priceHtml(p){ return p.price!=null ? `<span class="price">${eur(p.price)}</span>` : `<span class="price ask">Prezzo in negozio</span>`; }
+function card(p){ return `<a class="card" href="#p-${p.id}"><div class="ph"><img loading="lazy" src="${p.img}" alt="${esc(p.name)}"><span class="tag">${p.line==="Junior"?"10/16 anni":"Uomo"}</span></div><h3>${esc(p.name)}</h3>${priceHtml(p)}</a>`; }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),2200); }
+
+function renderHome(){
+  $("#cats").innerHTML = CATS.map(c=>{ const p=PRODUCTS.find(x=>x.cat===c); return `<button class="cat" data-cat="${c}"><img src="${p.img}" alt=""><span>${c}</span></button>`; }).join("");
+  $("#homeGrid").innerHTML = PRODUCTS.filter(p=>p.line==="Uomo").slice(0,8).map(card).join("");
+  $("#juniorGrid").innerHTML = PRODUCTS.filter(p=>p.line==="Junior").slice(0,8).map(card).join("");
+}
+function renderShop(){
+  $("#catFilters").innerHTML = ["Tutti",...CATS].map(c=>`<button class="chip" data-f="cat" data-v="${c}" aria-pressed="${state.cat===c}">${c}</button>`).join("");
+  $("#lineFilters").innerHTML = ["Tutte","Uomo","Junior"].map(c=>`<button class="chip" data-f="line" data-v="${c}" aria-pressed="${state.line===c}">${c==="Junior"?"10/16 anni":c}</button>`).join("");
+  const list = PRODUCTS.filter(p=>(state.cat==="Tutti"||p.cat===state.cat)&&(state.line==="Tutte"||p.line===state.line));
+  $("#shopCount").textContent = list.length + (list.length===1?" capo":" capi");
+  $("#shopGrid").innerHTML = list.length ? list.map(card).join("") : `<p class="empty">Nessun capo in questa combinazione. Prova un altro filtro.</p>`;
+}
+function renderProduct(id){
+  const p = PRODUCTS.find(x=>x.id===id); if(!p){ location.hash="#shop"; return; }
+  const sizes = p.line==="Junior" ? SIZES_JR : SIZES;
+  $("#v-prodotto").innerHTML = `<a class="back" href="#shop">&larr; Torna allo shop</a>
+  <div class="pd">
+    <div>
+      <div class="ph"><img id="mainImg" src="${p.foto[0]}" alt="${esc(p.name)}"></div>
+      ${p.foto.length>1?`<div class="thumbs" role="group" aria-label="Scegli la foto">${p.foto.map((f,i)=>`<button class="thumb" data-img="${f}" aria-pressed="${i===0}"><img src="${f}" alt=""><span>${i===0?"Su modello":"Foto dal negozio"}</span></button>`).join("")}</div>`:""}
+      <p class="src">${p.foto.length>1?"Foto su modello generata a partire dal capo reale; accanto la foto originale dal profilo Instagram del negozio.":"Foto prodotto generata a partire dal capo reale."}</p>
+    </div>
+    <div>
+      <p class="meta">${p.cat} · ${p.line==="Junior"?"Linea 10/16 anni":"Uomo"}</p>
+      <h1 class="disp">${esc(p.name)}</h1>
+      ${priceHtml(p)}
+      <p>${esc(p.desc)}</p>
+      <div class="field"><label>Taglia</label></div>
+      <div class="sizes" role="group" aria-label="Scegli la taglia">${sizes.map(s=>`<button class="size" data-size="${s}" aria-pressed="false">${s}</button>`).join("")}</div>
+      <p class="note">Taglie indicative: la disponibilità reale si conferma quando ci scrivi.</p>
+      <p class="err" id="sizeErr"></p>
+      <div class="ctas">
+        <button class="btn wide" id="addBtn" data-id="${p.id}">Aggiungi al carrello</button>
+        <a class="btn ghost wide" href="${IG}">Chiedi info su Instagram</a>
+      </div>
+      <div class="info">
+        <div><b>Consegna</b>24/48h oppure ritiro gratuito in uno dei 3 negozi</div>
+        <div><b>Pagamento</b>Alla conferma dell'ordine con il negozio</div>
+      </div>
+      <p class="src">Dal post Instagram del ${esc(p.post)}</p>
+    </div>
+  </div>
+  <div class="sec"><div class="sechead"><h2 class="disp">Potrebbe piacerti</h2></div><div class="grid">${PRODUCTS.filter(x=>x.id!==p.id&&x.cat===p.cat).concat(PRODUCTS.filter(x=>x.id!==p.id&&x.cat!==p.cat)).slice(0,4).map(card).join("")}</div></div>`;
+}
+function orderText(f){
+  let t = "Ciao Room 52! Vorrei ordinare:\n";
+  let tot=0, ask=false;
+  state.cart.forEach(it=>{ const p=PRODUCTS.find(x=>x.id===it.id); if(!p) return; t += `- ${p.name}, taglia ${it.s}, x${it.q}` + (p.price!=null?` (${eur(p.price*it.q)})`:" (prezzo da confermare)") + "\n"; if(p.price!=null) tot+=p.price*it.q; else ask=true; });
+  t += (tot===0&&ask) ? "Totale: da confermare in negozio\n" : `Totale indicativo: ${eur(tot)}${ask?" + capi con prezzo da confermare":""}\n`;
+  t += f.mode==="ritiro" ? `Ritiro in negozio: ${STORES.find(s=>s.id===f.store).addr}\n` : `Consegna a: ${f.addr||"(indirizzo da indicare)"}\n`;
+  if(f.name) t += `Nome: ${f.name}\n`;
+  return t;
+}
+function renderCart(){
+  const v = $("#v-carrello");
+  if(!state.cart.length){ v.innerHTML = `<h1 class="disp" style="font-size:38px;margin:22px 0 0">Carrello</h1><p class="empty">Il carrello è vuoto.<br><br><a class="btn" href="#shop">Vai allo shop</a></p>`; return; }
+  let tot=0, ask=false;
+  const rows = state.cart.map((it,i)=>{ const p=PRODUCTS.find(x=>x.id===it.id); if(!p) return ""; if(p.price!=null) tot+=p.price*it.q; else ask=true;
+    return `<div class="line"><img src="${p.img}" alt=""><div><h3>${esc(p.name)}</h3><div class="note">Taglia ${esc(it.s)}</div><div class="qty"><button data-q="${i}" data-d="-1" aria-label="Togli uno">-</button><span>${it.q}</span><button data-q="${i}" data-d="1" aria-label="Aggiungi uno">+</button></div></div><div style="text-align:right">${p.price!=null?`<span class="price">${eur(p.price*it.q)}</span>`:`<span class="price ask">In negozio</span>`}<br><button class="rm" data-rm="${i}">Rimuovi</button></div></div>`; }).join("");
+  v.innerHTML = `<h1 class="disp" style="font-size:38px;margin:22px 0 8px">Carrello</h1>
+  <div class="cartwrap"><div>${rows}</div>
+  <div class="summary">
+    <div class="tot"><span>Totale indicativo</span><span>${eur(tot)}</span></div>
+    ${ask?`<p class="note" style="margin:0">Alcuni capi hanno il prezzo in negozio: te lo confermiamo in chat.</p>`:""}
+    <label class="opt"><input type="radio" name="mode" value="consegna" checked> <span><b>Consegna 24/48h</b><br>Ti scriviamo per costi e pagamento.</span></label>
+    <label class="opt"><input type="radio" name="mode" value="ritiro"> <span><b>Ritira in negozio</b><br>Prova il capo e paghi lì.</span></label>
+    <div class="field" id="storeField" hidden><label for="store">Negozio</label><select id="store">${STORES.map(s=>`<option value="${s.id}">${s.name}: ${s.addr}</option>`).join("")}</select></div>
+    <div class="field" id="addrField"><label for="addr">Indirizzo di consegna</label><input id="addr" placeholder="Via, numero, città"></div>
+    <div class="field"><label for="cname">Nome</label><input id="cname" placeholder="Il tuo nome"></div>
+    <div class="field"><label>Messaggio che verrà inviato</label><div class="preview" id="preview"></div></div>
+    <button class="btn red wide" id="waBtn">Ordina su WhatsApp</button>
+    <button class="btn ghost wide" id="igBtn">Copia il messaggio e apri Instagram</button>
+    <p class="ph-warn" id="waWarn"></p>
+    <p class="note" style="margin:0">Nessun pagamento online: l'ordine arriva al negozio come messaggio e lo confermate in chat.</p>
+  </div></div>`;
+  updatePreview();
+}
+function formData(){ const m=document.querySelector('input[name="mode"]:checked'); return {mode:m?m.value:"consegna", store:($("#store")||{}).value||"santeramo", addr:($("#addr")||{}).value||"", name:($("#cname")||{}).value||""}; }
+function updatePreview(){ const f=formData(); const sf=$("#storeField"), af=$("#addrField"); if(sf){ sf.hidden = f.mode!=="ritiro"; af.hidden = f.mode==="ritiro"; } const pv=$("#preview"); if(pv) pv.textContent = orderText(f); }
+function renderStores(){
+  $("#storesList").innerHTML = STORES.map(s=>`<div class="store"><span class="badge">${s.badge}</span><h3>${s.name}</h3><p style="margin:0 0 10px">${s.addr}</p><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Room 52 Store "+s.addr)}">Indicazioni</a></div>`).join("");
+  $("#waText").textContent = WHATSAPP.startsWith("NUMERO") ? "Numero WhatsApp in arrivo" : "+"+WHATSAPP;
+}
+
+function route(){
+  const h = (location.hash||"#home").slice(1);
+  let view = h;
+  if(h.startsWith("p-")){ view="prodotto"; renderProduct(h.slice(2)); }
+  if(view==="shop") renderShop();
+  if(view==="carrello") renderCart();
+  if(!document.getElementById("v-"+view)) view="home";
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id==="v-"+view));
+  document.querySelectorAll("nav.main a").forEach(a=>{ if(a.getAttribute("href")==="#"+view) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  $("#drawer").classList.remove("open"); $("#menuBtn").setAttribute("aria-expanded","false");
+  window.scrollTo(0,0);
+}
+
+document.addEventListener("click", e=>{
+  const t = e.target.closest("button, a"); if(!t) return;
+  if(t.id==="menuBtn"){ const o=$("#drawer").classList.toggle("open"); t.setAttribute("aria-expanded",o); return; }
+  if(t.dataset.cat){ state.cat=t.dataset.cat; state.line="Tutte"; location.hash="#shop"; renderShop(); return; }
+  if(t.dataset.linea){ state.line=t.dataset.linea; state.cat="Tutti"; }
+  if(t.dataset.f){ state[t.dataset.f]=t.dataset.v; renderShop(); return; }
+  if(t.dataset.img){ $("#mainImg").src=t.dataset.img; document.querySelectorAll(".thumb").forEach(b=>b.setAttribute("aria-pressed", b===t)); return; }
+  if(t.dataset.size){ document.querySelectorAll(".size").forEach(b=>b.setAttribute("aria-pressed", b===t)); $("#sizeErr").textContent=""; return; }
+  if(t.id==="addBtn"){ const sel=document.querySelector('.size[aria-pressed="true"]'); if(!sel){ $("#sizeErr").textContent="Scegli una taglia per continuare."; return; }
+    const id=t.dataset.id, s=sel.dataset.size; const ex=state.cart.find(x=>x.id===id&&x.s===s); if(ex) ex.q++; else state.cart.push({id,s,q:1}); save(); toast("Aggiunto al carrello"); return; }
+  if(t.dataset.q!==undefined){ const it=state.cart[+t.dataset.q]; it.q+=+t.dataset.d; if(it.q<1) state.cart.splice(+t.dataset.q,1); save(); renderCart(); return; }
+  if(t.dataset.rm!==undefined){ state.cart.splice(+t.dataset.rm,1); save(); renderCart(); return; }
+  if(t.id==="waBtn"){ const msg=orderText(formData());
+    if(WHATSAPP.startsWith("NUMERO")){ $("#waWarn").textContent="Il numero WhatsApp del negozio non è ancora collegato: il messaggio qui sopra è quello che partirà."; return; }
+    const a=document.createElement("a"); a.href="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(msg); a.target="_blank"; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove(); return; }
+  if(t.id==="igBtn"){ const msg=orderText(formData());
+    (navigator.clipboard?navigator.clipboard.writeText(msg):Promise.reject()).then(()=>toast("Messaggio copiato: incollalo nel DM")).catch(()=>toast("Copia il messaggio dal riquadro qui sopra"));
+    const a=document.createElement("a"); a.href="https://ig.me/m/room52_store"; a.target="_blank"; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove(); return; }
+});
+document.addEventListener("input", e=>{ if(e.target.closest("#v-carrello")) updatePreview(); });
+document.addEventListener("change", e=>{ if(e.target.closest("#v-carrello")) updatePreview(); });
+window.addEventListener("hashchange", route);
+renderHome(); renderStores(); save(); route();
+// ---- Tour guidato "Come funziona" ----
+const TOUR = [
+  {hash:"#shop", sel:["#catFilters",".subf"], t:"Categorie e filtri", p:"Scegli la categoria (felpe, giubbotti, pantaloni…) e la linea: Uomo o 10/16 anni."},
+  {hash:"#p-bomber-grigio", sel:[".thumbs"], t:"Scheda prodotto", p:"Ogni capo ha la sua scheda. Tocca le miniature: foto su modello e foto vera dal negozio."},
+  {hash:"#p-bomber-grigio", sel:[".sizes"], t:"Taglia", p:"Scegli la taglia, poi tocca \"Aggiungi al carrello\"."},
+  {hash:"#carrello", sel:["#v-carrello .line"], cart:true, t:"Carrello", p:"Qui trovi i capi scelti, le quantità e il totale."},
+  {hash:"#carrello", sel:[".opt"], cart:true, t:"Consegna o ritiro", p:"Consegna in 24/48h oppure ritiro gratuito in uno dei 3 negozi."},
+  {hash:"#carrello", sel:["#preview","#waBtn"], cart:true, t:"Ordine su WhatsApp o DM", p:"Niente pagamento online: al negozio arriva un messaggio già pronto con capi, taglie e consegna o ritiro. Si conferma in chat."},
+  {hash:"#chi-siamo", sel:[".facts"], t:"Chi siamo e negozi", p:"La storia di Alessio e, nella pagina Negozi, gli indirizzi con le indicazioni."},
+  {hash:"#home", sel:[], t:"Per andare online davvero", list:["Pagamenti online (es. Shopify o lo shop già attivo su room52store.it)","Prezzi di tutti i capi","Taglie e disponibilità vere","Numero WhatsApp del negozio"]}
+];
+let tourI=-1, tourAdded=false, tourEls=null;
+function tourEnsureCart(){ if(!state.cart.length){ state.cart.push({id:"bomber-grigio",s:"L",q:1}); tourAdded=true; save(); } }
+function tourEnd(){
+  if(tourEls){ tourEls.forEach(e=>e.remove()); tourEls=null; }
+  if(tourAdded){ state.cart=state.cart.filter(x=>!(x.id==="bomber-grigio"&&x.s==="L")); tourAdded=false; save(); }
+  tourI=-1; try{ localStorage.setItem("r52tour","1"); }catch(e){}
+  window.removeEventListener("resize", tourPlace); window.removeEventListener("scroll", tourPlace);
+  location.hash="#home";
+}
+function tourRect(){
+  const s=TOUR[tourI]; const els=s.sel.flatMap(q=>[...document.querySelectorAll(q)]);
+  if(!els.length) return null;
+  let r={l:1e9,t:1e9,r:-1e9,b:-1e9};
+  els.forEach(e=>{ const b=e.getBoundingClientRect(); r.l=Math.min(r.l,b.left); r.t=Math.min(r.t,b.top); r.r=Math.max(r.r,b.right); r.b=Math.max(r.b,b.bottom); });
+  return r;
+}
+function tourPlace(){
+  if(tourI<0||!tourEls) return;
+  const [hl,bub]=tourEls; const r=tourRect(); const vw=window.innerWidth, vh=window.innerHeight; const pad=6;
+  const bw=bub.offsetWidth, bh=bub.offsetHeight;
+  if(!r){ hl.className="tour-hl none"; hl.style.left=vw/2+"px"; hl.style.top=vh/2+"px"; bub.style.left=(vw-bw)/2+"px"; bub.style.top=Math.max(16,(vh-bh)/2)+"px"; return; }
+  hl.className="tour-hl";
+  const top=Math.max(r.t-pad,4), bot=Math.min(r.b+pad,vh-4);
+  Object.assign(hl.style,{left:(r.l-pad)+"px",top:top+"px",width:(r.r-r.l+2*pad)+"px",height:Math.max(0,bot-top)+"px"});
+  let y = (vh-bot >= bh+16) ? bot+12 : (top >= bh+16 ? top-bh-12 : vh-bh-12);
+  let x = Math.min(Math.max(16, (r.l+r.r)/2-bw/2), vw-bw-16);
+  bub.style.left=x+"px"; bub.style.top=Math.max(8,y)+"px";
+}
+function tourShow(i){
+  tourI=i; const s=TOUR[i];
+  if(s.cart) tourEnsureCart();
+  if(location.hash!==s.hash){ location.hash=s.hash; } else { route(); }
+  setTimeout(()=>{
+    if(!tourEls){ const blk=document.createElement("div"); blk.className="tour-block"; const hl=document.createElement("div"); const bub=document.createElement("div"); bub.className="tour-bub"; bub.setAttribute("role","dialog"); bub.setAttribute("aria-live","polite"); document.body.append(blk,hl,bub); tourEls=[hl,bub,blk]; window.addEventListener("resize",tourPlace); window.addEventListener("scroll",tourPlace,{passive:true}); }
+    const bub=tourEls[1];
+    bub.innerHTML=`<div class="st">Passo ${i+1} di ${TOUR.length}</div><h3>${s.t}</h3>${s.p?`<p>${s.p}</p>`:""}${s.list?`<ul>${s.list.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}
+      <div class="tour-nav"><button class="sk" data-tour="skip">Salta</button><span class="sp"></span>${i>0?`<button data-tour="prev">Indietro</button>`:""}<button class="nx" data-tour="next">${i===TOUR.length-1?"Fine":"Avanti"}</button></div>`;
+    const first=document.querySelector(s.sel[0]||"__none__");
+    if(first){ const y=first.getBoundingClientRect().top+window.scrollY-110; window.scrollTo(0,Math.max(0,y)); } else window.scrollTo(0,0);
+    requestAnimationFrame(()=>{ tourPlace(); bub.querySelector(".nx").focus({preventScroll:true}); });
+  }, 120);
+}
+document.addEventListener("click", e=>{
+  const b=e.target.closest("[data-tour]"); if(b){ e.stopPropagation(); const a=b.dataset.tour;
+    if(a==="next"){ tourI<TOUR.length-1 ? tourShow(tourI+1) : tourEnd(); }
+    else if(a==="prev"){ tourShow(Math.max(0,tourI-1)); }
+    else tourEnd();
+    return; }
+  if(e.target.closest("#helpBtn")){ tourShow(0); }
+}, true);
+document.addEventListener("keydown", e=>{ if(tourI<0) return; if(e.key==="Escape") tourEnd(); if(e.key==="ArrowRight") document.querySelector('[data-tour="next"]')?.click(); if(e.key==="ArrowLeft") document.querySelector('[data-tour="prev"]')?.click(); });
+let seen=false; try{ seen=localStorage.getItem("r52tour")==="1"; }catch(e){ seen=true; }
+if(!seen) setTimeout(()=>tourShow(0), 700);
+
+</script>
+</body>
+</html>
